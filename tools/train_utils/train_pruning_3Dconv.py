@@ -312,7 +312,7 @@ def train_pruning_Hrank_pillar(model, optimizer, train_loader, train_set, MODEL,
     print("Hrank-based pruning completed!")
     return newmodel
 
-def train_pruning_Hrank_vovel(model, optimizer, train_loader, train_set, MODEL, cfg, args, optim_cfg, start_epoch,
+def train_pruning_Hrank_voxel(model, optimizer, train_loader, train_set, MODEL, cfg, args, optim_cfg, start_epoch,
                         total_epochs, ckpt_save_dir, PRUNING2D, Random):
     """
     Hrank voxel  +weights
