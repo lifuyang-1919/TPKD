@@ -177,46 +177,10 @@ def train_model_kd(model, optimizer, train_loader, model_func, lr_scheduler, opt
                 else:
                     cur_scheduler = lr_scheduler
                 interval = cur_epoch // optim_cfg.TTT
-                Cycle = interval // 3
+                Cycle = interval // 2
 
-                if interval % 3 == 0 and (Cycle < optim_cfg.Cycle_num):  # 0， 1， 2
-                    temperature = 200.00
+                if interval % 2 == 0 and (Cycle < optim_cfg.Cycle_num): 
                     accumulated_iter = train_one_epoch(  # 训练一个epoch
-                        model, optimizer, train_loader, model_func,
-                        lr_scheduler=cur_scheduler,
-                        accumulated_iter=accumulated_iter, optim_cfg=optim_cfg,
-                        rank=rank, tbar=tbar, tb_log=tb_log,
-                        leave_pbar=(cur_epoch + 1 == total_epochs),
-                        total_it_each_epoch=total_it_each_epoch,
-                        dataloader_iter=dataloader_iter,
-                        teacher_model=teacher_model,
-                        extra_optim=extra_optim,
-                        extra_lr_scheduler=extra_lr_scheduler,
-                        teacher_model_2=teacher_model_2,
-                        teacher_num=teacher_num,
-                        teacher_models=teacher_models,
-                        temperature=temperature
-                    )
-                if interval % 3 == 1 and (Cycle < optim_cfg.Cycle_num):  # 0， 1， 2
-                    temperature = 0.02
-                    accumulated_iter = train_one_epoch(  # 训练一个epoch
-                        model, optimizer, train_loader, model_func,
-                        lr_scheduler=cur_scheduler,
-                        accumulated_iter=accumulated_iter, optim_cfg=optim_cfg,
-                        rank=rank, tbar=tbar, tb_log=tb_log,
-                        leave_pbar=(cur_epoch + 1 == total_epochs),
-                        total_it_each_epoch=total_it_each_epoch,
-                        dataloader_iter=dataloader_iter,
-                        teacher_model=teacher_model,
-                        extra_optim=extra_optim,
-                        extra_lr_scheduler=extra_lr_scheduler,
-                        teacher_model_2=teacher_model_2,
-                        teacher_num=teacher_num,
-                        teacher_models=teacher_models,
-                        temperature=temperature
-                    )
-                elif interval % 3 == 2 and (Cycle < optim_cfg.Cycle_num):
-                    accumulated_iter = train_one_epoch(
                         model, optimizer, train_loader, model_func,
                         lr_scheduler=cur_scheduler,
                         accumulated_iter=accumulated_iter, optim_cfg=optim_cfg,
@@ -228,8 +192,23 @@ def train_model_kd(model, optimizer, train_loader, model_func, lr_scheduler, opt
                         extra_optim=extra_optim,
                         extra_lr_scheduler=extra_lr_scheduler,
                         teacher_model_2=None,
-                        teacher_num=None,
-                        temperature=0
+                        teacher_num=teacher_num,
+                    )
+                elif interval % 2 == 1 and (Cycle < optim_cfg.Cycle_num):  
+                    temperature = 0.02
+                    accumulated_iter = train_one_epoch(  # 训练一个epoch
+                        model, optimizer, train_loader, model_func,
+                        lr_scheduler=cur_scheduler,
+                        accumulated_iter=accumulated_iter, optim_cfg=optim_cfg,
+                        rank=rank, tbar=tbar, tb_log=tb_log,
+                        leave_pbar=(cur_epoch + 1 == total_epochs),
+                        total_it_each_epoch=total_it_each_epoch,
+                        dataloader_iter=dataloader_iter,
+                        teacher_model=teacher_model_2,
+                        extra_optim=extra_optim,
+                        extra_lr_scheduler=extra_lr_scheduler,
+                        teacher_model_2=None,
+                        teacher_num=teacher_num,
                     )
                 else:
                     optim_cfg.TTT = 2*optim_cfg.TTT
