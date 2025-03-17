@@ -1,11 +1,8 @@
 CLASS_NAMES: ['Vehicle', 'Pedestrian', 'Cyclist']
 
 #PRETRAINED_MODEL: '../output/waymo_models/cp-voxel/t/voxel_t0.5.pth'
-TEACHER_CKPT: '../output/waymo_models/cp-voxel/t/voxel_t1.0.pth'
-TEACHER_CKPT_2: ' ../output/waymo_models/cp-voxel/t/voxel_t1.0g0.875.pth'
-TEACHER_CKPT_3: ' ../output/waymo_models/cp-voxel/t/voxel_t1.0g0.75.pth'
-TEACHER_CKPT_4: ' ../output/waymo_models/cp-voxel/t/voxel_t0.875g0.875.pth'
-TEACHER_CKPT_5: ' ../output/waymo_models/cp-voxel/t/voxel_t0.75g0.875.pth'
+TEACHER_CKPT: '../output/waymo_models/cp-voxel/t/voxel_g0.75.pth'
+TEACHER_CKPT_2: ' ../output/waymo_models/cp-voxel/t/voxel_t0.75.pth'
 
 DATA_CONFIG:
     _BASE_CONFIG_: cfgs/dataset_configs/waymo_dataset.yaml
@@ -206,276 +203,6 @@ MODEL_TEACHER_2:
         # [input, conv1, conv2, conv3, conv4, output]
         NUM_FILTERS: [16, 16, 32, 64, 128, 128]
         LAYER_NUMS: [1, 2, 3, 3, 3, 1]
-        WIDTH: 1.0  #1.0
-
-    MAP_TO_BEV:
-        NAME: HeightCompression
-        NUM_BEV_FEATURES: 256  #192  #256
-
-    BACKBONE_2D:
-        NAME: BaseBEVBackbone
-        ACT_FN: ReLU
-        NORM_TYPE: BatchNorm2d
-        WIDTH: 1.0  #1.0
-
-        LAYER_NUMS: [5, 5]
-        LAYER_STRIDES: [1, 2]
-        NUM_FILTERS: [128, 256]
-        UPSAMPLE_STRIDES: [1, 2]
-        NUM_UPSAMPLE_FILTERS: [256, 256]
-
-    DENSE_HEAD:
-        NAME: CenterHead
-        CLASS_AGNOSTIC: False
-        ACT_FN: ReLU
-        NORM_TYPE: BatchNorm2d
-
-        CLASS_NAMES_EACH_HEAD: [
-            ['Vehicle', 'Pedestrian', 'Cyclist']
-        ]
-
-        SHARED_CONV_CHANNEL: 64  #48  #64
-        USE_BIAS_BEFORE_NORM: True
-        NUM_HM_CONV: 2
-        SEPARATE_HEAD_CFG:
-            HEAD_ORDER: ['center', 'center_z', 'dim', 'rot']
-            HEAD_DICT: {
-                'center': {'out_channels': 2, 'num_conv': 2},
-                'center_z': {'out_channels': 1, 'num_conv': 2},
-                'dim': {'out_channels': 3, 'num_conv': 2},
-                'rot': {'out_channels': 2, 'num_conv': 2},
-            }
-
-        TARGET_ASSIGNER_CONFIG:
-            FEATURE_MAP_STRIDE: 8
-            NUM_MAX_OBJS: 500
-            GAUSSIAN_OVERLAP: 0.1
-            MIN_RADIUS: 2
-
-        LOSS_CONFIG:
-            LOSS_WEIGHTS: {
-                'cls_weight': 1.0,
-                'loc_weight': 2.0,
-                'code_weights': [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
-            }
-
-        POST_PROCESSING:
-            SCORE_THRESH: 0.1
-            POST_CENTER_LIMIT_RANGE: [-75.2, -75.2, -2, 75.2, 75.2, 4]
-            MAX_OBJ_PER_SAMPLE: 500
-            NMS_CONFIG:
-                NMS_TYPE: nms_gpu
-                NMS_THRESH: 0.7
-                NMS_PRE_MAXSIZE: 4096
-                NMS_POST_MAXSIZE: 500
-
-    POST_PROCESSING:
-        RECALL_THRESH_LIST: [0.3, 0.5, 0.7]
-
-        EVAL_METRIC: waymo
-        EVAL_CLASSES: {
-            'LEVEL_2/AP': [ 'OBJECT_TYPE_TYPE_VEHICLE_LEVEL_2/AP',
-                            'OBJECT_TYPE_TYPE_PEDESTRIAN_LEVEL_2/AP',
-                            'OBJECT_TYPE_TYPE_CYCLIST_LEVEL_2/AP'
-            ],
-            'LEVEL_2/APH': [ 'OBJECT_TYPE_TYPE_VEHICLE_LEVEL_2/APH',
-                             'OBJECT_TYPE_TYPE_PEDESTRIAN_LEVEL_2/APH',
-                             'OBJECT_TYPE_TYPE_CYCLIST_LEVEL_2/APH'
-            ]
-        }
-MODEL_TEACHER_3:
-    NAME: CenterPoint
-    IS_TEACHER: True
-
-    VFE:
-        NAME: MeanVFE
-
-    BACKBONE_3D:
-        NAME: VoxelResBackBone8x
-        ACT_FN: ReLU
-        # [input, conv1, conv2, conv3, conv4, output]
-        NUM_FILTERS: [16, 16, 32, 64, 128, 128]
-        LAYER_NUMS: [1, 2, 3, 3, 3, 1]
-        WIDTH: 1.0  #1.0
-
-    MAP_TO_BEV:
-        NAME: HeightCompression
-        NUM_BEV_FEATURES: 256  #192  #256
-
-    BACKBONE_2D:
-        NAME: BaseBEVBackbone
-        ACT_FN: ReLU
-        NORM_TYPE: BatchNorm2d
-        WIDTH: 1.0  #1.0
-
-        LAYER_NUMS: [5, 5]
-        LAYER_STRIDES: [1, 2]
-        NUM_FILTERS: [128, 256]
-        UPSAMPLE_STRIDES: [1, 2]
-        NUM_UPSAMPLE_FILTERS: [256, 256]
-
-    DENSE_HEAD:
-        NAME: CenterHead
-        CLASS_AGNOSTIC: False
-        ACT_FN: ReLU
-        NORM_TYPE: BatchNorm2d
-
-        CLASS_NAMES_EACH_HEAD: [
-            ['Vehicle', 'Pedestrian', 'Cyclist']
-        ]
-
-        SHARED_CONV_CHANNEL: 64  #48  #64
-        USE_BIAS_BEFORE_NORM: True
-        NUM_HM_CONV: 2
-        SEPARATE_HEAD_CFG:
-            HEAD_ORDER: ['center', 'center_z', 'dim', 'rot']
-            HEAD_DICT: {
-                'center': {'out_channels': 2, 'num_conv': 2},
-                'center_z': {'out_channels': 1, 'num_conv': 2},
-                'dim': {'out_channels': 3, 'num_conv': 2},
-                'rot': {'out_channels': 2, 'num_conv': 2},
-            }
-
-        TARGET_ASSIGNER_CONFIG:
-            FEATURE_MAP_STRIDE: 8
-            NUM_MAX_OBJS: 500
-            GAUSSIAN_OVERLAP: 0.1
-            MIN_RADIUS: 2
-
-        LOSS_CONFIG:
-            LOSS_WEIGHTS: {
-                'cls_weight': 1.0,
-                'loc_weight': 2.0,
-                'code_weights': [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
-            }
-
-        POST_PROCESSING:
-            SCORE_THRESH: 0.1
-            POST_CENTER_LIMIT_RANGE: [-75.2, -75.2, -2, 75.2, 75.2, 4]
-            MAX_OBJ_PER_SAMPLE: 500
-            NMS_CONFIG:
-                NMS_TYPE: nms_gpu
-                NMS_THRESH: 0.7
-                NMS_PRE_MAXSIZE: 4096
-                NMS_POST_MAXSIZE: 500
-
-    POST_PROCESSING:
-        RECALL_THRESH_LIST: [0.3, 0.5, 0.7]
-
-        EVAL_METRIC: waymo
-        EVAL_CLASSES: {
-            'LEVEL_2/AP': [ 'OBJECT_TYPE_TYPE_VEHICLE_LEVEL_2/AP',
-                            'OBJECT_TYPE_TYPE_PEDESTRIAN_LEVEL_2/AP',
-                            'OBJECT_TYPE_TYPE_CYCLIST_LEVEL_2/AP'
-            ],
-            'LEVEL_2/APH': [ 'OBJECT_TYPE_TYPE_VEHICLE_LEVEL_2/APH',
-                             'OBJECT_TYPE_TYPE_PEDESTRIAN_LEVEL_2/APH',
-                             'OBJECT_TYPE_TYPE_CYCLIST_LEVEL_2/APH'
-            ]
-        }
-MODEL_TEACHER_4:
-    NAME: CenterPoint
-    IS_TEACHER: True
-
-    VFE:
-        NAME: MeanVFE
-
-    BACKBONE_3D:
-        NAME: VoxelResBackBone8x
-        ACT_FN: ReLU
-        # [input, conv1, conv2, conv3, conv4, output]
-        NUM_FILTERS: [16, 16, 32, 64, 128, 128]
-        LAYER_NUMS: [1, 2, 3, 3, 3, 1]
-        WIDTH: 0.875  #1.0 0.875
-
-    MAP_TO_BEV:
-        NAME: HeightCompression
-        NUM_BEV_FEATURES: 224  #192  #256
-
-    BACKBONE_2D:
-        NAME: BaseBEVBackbone
-        ACT_FN: ReLU
-        NORM_TYPE: BatchNorm2d
-        WIDTH: 0.875  #1.0 0.875
-
-        LAYER_NUMS: [5, 5]
-        LAYER_STRIDES: [1, 2]
-        NUM_FILTERS: [128, 256]
-        UPSAMPLE_STRIDES: [1, 2]
-        NUM_UPSAMPLE_FILTERS: [256, 256]
-
-    DENSE_HEAD:
-        NAME: CenterHead
-        CLASS_AGNOSTIC: False
-        ACT_FN: ReLU
-        NORM_TYPE: BatchNorm2d
-
-        CLASS_NAMES_EACH_HEAD: [
-            ['Vehicle', 'Pedestrian', 'Cyclist']
-        ]
-
-        SHARED_CONV_CHANNEL: 56  #48  #64
-        USE_BIAS_BEFORE_NORM: True
-        NUM_HM_CONV: 2
-        SEPARATE_HEAD_CFG:
-            HEAD_ORDER: ['center', 'center_z', 'dim', 'rot']
-            HEAD_DICT: {
-                'center': {'out_channels': 2, 'num_conv': 2},
-                'center_z': {'out_channels': 1, 'num_conv': 2},
-                'dim': {'out_channels': 3, 'num_conv': 2},
-                'rot': {'out_channels': 2, 'num_conv': 2},
-            }
-
-        TARGET_ASSIGNER_CONFIG:
-            FEATURE_MAP_STRIDE: 8
-            NUM_MAX_OBJS: 500
-            GAUSSIAN_OVERLAP: 0.1
-            MIN_RADIUS: 2
-
-        LOSS_CONFIG:
-            LOSS_WEIGHTS: {
-                'cls_weight': 1.0,
-                'loc_weight': 2.0,
-                'code_weights': [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
-            }
-
-        POST_PROCESSING:
-            SCORE_THRESH: 0.1
-            POST_CENTER_LIMIT_RANGE: [-75.2, -75.2, -2, 75.2, 75.2, 4]
-            MAX_OBJ_PER_SAMPLE: 500
-            NMS_CONFIG:
-                NMS_TYPE: nms_gpu
-                NMS_THRESH: 0.7
-                NMS_PRE_MAXSIZE: 4096
-                NMS_POST_MAXSIZE: 500
-
-    POST_PROCESSING:
-        RECALL_THRESH_LIST: [0.3, 0.5, 0.7]
-
-        EVAL_METRIC: waymo
-        EVAL_CLASSES: {
-            'LEVEL_2/AP': [ 'OBJECT_TYPE_TYPE_VEHICLE_LEVEL_2/AP',
-                            'OBJECT_TYPE_TYPE_PEDESTRIAN_LEVEL_2/AP',
-                            'OBJECT_TYPE_TYPE_CYCLIST_LEVEL_2/AP'
-            ],
-            'LEVEL_2/APH': [ 'OBJECT_TYPE_TYPE_VEHICLE_LEVEL_2/APH',
-                             'OBJECT_TYPE_TYPE_PEDESTRIAN_LEVEL_2/APH',
-                             'OBJECT_TYPE_TYPE_CYCLIST_LEVEL_2/APH'
-            ]
-        }
-MODEL_TEACHER_5:
-    NAME: CenterPoint
-    IS_TEACHER: True
-
-    VFE:
-        NAME: MeanVFE
-
-    BACKBONE_3D:
-        NAME: VoxelResBackBone8x
-        ACT_FN: ReLU
-        # [input, conv1, conv2, conv3, conv4, output]
-        NUM_FILTERS: [16, 16, 32, 64, 128, 128]
-        LAYER_NUMS: [1, 2, 3, 3, 3, 1]
         WIDTH: 0.75  #1.0
 
     MAP_TO_BEV:
@@ -563,9 +290,10 @@ OPTIMIZATION:
     LR: 0.003
     WEIGHT_DECAY: 0.01
     MOMENTUM: 0.9
-    TTT: 50
+    TTT: 20
+    TTT_list: 0
     T_range:  [200, 200] # [0.1, 10][1, 10]
-    Cycle_num: 1   # NUM_EPOCHS= cycle_num*TTT*3
+    Cycle_num: 3   # NUM_EPOCHS= cycle_num*TTT*3
     Cycle_decay: [1.0, 0.3, 0.3, 0.1]  # lr*Cycle_decay
 
     MOMS: [0.95, 0.85]
@@ -641,7 +369,7 @@ KD:
             GRID_SIZE: 7
             DOWNSAMPLE_RATIO: 1
 
-            ROI: tea_5 # ['gt', 'tea', 'stu'， tea_5， tea_2， select]
+            ROI: gt # ['gt', 'tea', 'stu'， tea_5， tea_2， select]
             THRESH: 0.7 # for teacher prediction for student prediction
             MAX_ROIS: 50
 
@@ -667,7 +395,7 @@ KD_LOSS:
     TEA_ACCUR: [1.0, 0.875, 0.75, 0.625, 0.5]  # tea_accur weighting
     HM_LOSS: {
         type: MSELoss, # [FocalLossCenterNet, SmoothL1Loss, MSELoss]
-        weight: 15.0,
+        weight: 10.0,
         thresh: 0.0,  # threshold for score PP Logit KD
         fg_mask: True,
         soft_mask: True,
