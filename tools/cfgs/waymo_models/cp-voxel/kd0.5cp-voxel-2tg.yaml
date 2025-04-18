@@ -284,7 +284,7 @@ MODEL_TEACHER_2:
 
 OPTIMIZATION:
     BATCH_SIZE_PER_GPU: 4
-    NUM_EPOCHS: 150
+    NUM_EPOCHS: 60
 
     OPTIMIZER: SegmentedOneCycle  #adam_onecycle  SegmentedOneCycle
     LR: 0.003
@@ -294,7 +294,7 @@ OPTIMIZATION:
     TTT_list: 0
     T_range:  [200, 200] # [0.1, 10][1, 10]
     Cycle_num: 3   # NUM_EPOCHS= cycle_num*TTT*3
-    Cycle_decay: [1.0, 0.3, 0.3, 0.1]  # lr*Cycle_decay
+    Cycle_decay: [1.0, 0.3, 0.09]  # lr*Cycle_decay
 
     MOMS: [0.95, 0.85]
     PCT_START: 0.4
@@ -340,7 +340,7 @@ KD:
         }
 
     FEATURE_KD:
-        ENABLED: True
+        ENABLED: False
 
         FEATURE_NAME: spatial_features_2d
         FEATURE_NAME_TEA: spatial_features_2d
